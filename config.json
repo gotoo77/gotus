@@ -1,0 +1,14 @@
+{
+  "sound": {
+    "ok": "assets/sounds/ok.wav",
+    "present": "assets/sounds/present.wav",
+    "absent": "assets/sounds/absent.wav",
+    "victory": "assets/sounds/victory.wav",
+    "defeat": "assets/sounds/defeat.wav",
+    "wrong": "assets/sounds/wrong.wav"
+  },
+  "timing": {
+    "letterDelay": 300
+  },
+  "theme": "dark"
+}

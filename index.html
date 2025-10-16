@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang='fr'>
+ <head>
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width,initial-scale=1' />
+  <title>Gotus v2</title>
+  <link rel='icon' type='image/svg+xml' href='favicon.svg' />
+  <link rel='stylesheet' href='style.css' />
+ </head>
+ <!-- 🎭 Fenêtre modale Gotus -->
+ <div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <h2 id="modal-title">Titre</h2>
+    <p id="modal-text">Contenu</p>
+    <div class="modal-buttons">
+      <button id="modal-ok">OK</button>
+    </div>
+  </div>
+ </div>
+ <body>
+  <div class='app'>
+   <header>
+    <h1>
+     <span class='dot'></span>Gotus
+    </h1>
+    <div class='tools'>
+     <button id='themeToggle' aria-label='Changer le thème'>🌗</button>
+     <div id='stats'></div>
+     <button id='newGame' class='primary'>Nouvelle partie</button>
+    </div>
+   </header>
+   <main>
+    <div id='board' class='board' aria-label='Grille du jeu'></div>
+    <p id='hint' class='hint'>Trouve le mot de 6 lettres. Entrée pour valider, ⌫ pour effacer. 1ʳᵉ lettre donnée.</p>
+    <div id='keyboard' class='keyboard' aria-label='Clavier virtuel'></div>
+   </main>
+   <footer>
+    <a href='#' id='rules'>Règles</a>
+    <span>•</span>
+    <a href='https://pages.github.com/' target='_blank' rel='noopener'>GitHub Pages</a>
+   </footer>
+  </div>
+  <audio id='sfx-ok' src='assets/sounds/ok.wav' preload='auto'></audio>
+  <audio id='sfx-present' src='assets/sounds/present.wav' preload='auto'></audio>
+  <audio id='sfx-absent' src='assets/sounds/absent.wav' preload='auto'></audio>
+  <audio id='sfx-victory' src='assets/sounds/victory.wav' preload='auto'></audio>
+  <audio id='sfx-defeat' src='assets/sounds/defeat.wav' preload='auto'></audio>
+  <audio id="sfx-wrong" src="assets/sounds/wrong.wav" preload="auto"></audio>
+
+  <script type="module" src="logger.js"></script>
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>
