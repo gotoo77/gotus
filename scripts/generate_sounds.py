@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-🎧 generate_sound.py
+🎧 generate_sounds.py
 Petit utilitaire pour créer rapidement des sons .wav synthétiques (bip, buzz, jingle).
 
 📦 Usage de base :
-    python3 generate_sound.py wrong.wav 110,0,80 120,60,200
-    python3 generate_sound.py victory.wav 523,659,784,1046 120,120,120,220
+    python3 scripts/generate_sounds.py wrong.wav 110,0,80 120,60,200
+    python3 scripts/generate_sounds.py victory.wav 523,659,784,1046 120,120,120,220
 
 🪄 Générer tous les sons par défaut de Gotus :
-    python3 generate_sound.py presets
+    python3 scripts/generate_sounds.py presets
 
 🔊 Écouter le son après génération :
-    python3 generate_sound.py wrong.wav 110,0,80 120,60,200 --preview
+    python3 scripts/generate_sounds.py wrong.wav 110,0,80 120,60,200 --preview
 """
 
 import sys, math, wave, os
@@ -85,8 +85,8 @@ def main():
         return
 
     if len(args) < 3:
-        print("Usage : python3 generate_sound.py <fichier.wav> <frequences> <durees> [--preview]")
-        print("Exemple : python3 generate_sound.py beep.wav 440,880,660 100,100,200")
+        print("Usage : python3 scripts/generate_sounds.py <fichier.wav> <frequences> <durees> [--preview]")
+        print("Exemple : python3 scripts/generate_sounds.py beep.wav 440,880,660 100,100,200")
         return
 
     path = args[0]
@@ -102,4 +102,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

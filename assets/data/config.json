@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "sound": {
     "ok": "assets/sounds/ok.wav",
     "present": "assets/sounds/present.wav",

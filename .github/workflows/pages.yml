@@ -1,0 +1,55 @@
+name: Déployer les versions
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt et tous ses tags
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Préparer Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Vérifier le projet
+        run: npm run check
+      - name: Construire le site multi-version
+        run: npm run build:pages
+      - name: Configurer GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Préparer l'artefact Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .pages
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déployer GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

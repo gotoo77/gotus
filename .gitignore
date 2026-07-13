@@ -1,0 +1,14 @@
+# Dépendances et caches
+node_modules/
+__pycache__/
+*.py[cod]
+
+# Fichiers locaux
+.devmenu_history.json
+.DS_Store
+
+# Rapports temporaires
+coverage/
+playwright-report/
+test-results/
+.pages/

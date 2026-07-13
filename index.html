@@ -1,54 +1,122 @@
 <!DOCTYPE html>
-<html lang='fr'>
- <head>
-  <meta charset='utf-8' />
-  <meta name='viewport' content='width=device-width,initial-scale=1' />
-  <title>Gotus v2</title>
-  <link rel='icon' type='image/svg+xml' href='favicon.svg' />
-  <link rel='stylesheet' href='style.css' />
- </head>
- <!-- 🎭 Fenêtre modale Gotus -->
- <div id="modal" class="modal hidden">
-  <div class="modal-box">
-    <h2 id="modal-title">Titre</h2>
-    <p id="modal-text">Contenu</p>
-    <div class="modal-buttons">
-      <button id="modal-ok">OK</button>
+<!--
+  Gotus — point d’entrée de l’application.
+  @version 2.2.0
+  @author Gotoo et les contributeurs
+  @license MIT
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gotus, un jeu gratuit de lettres françaises en six essais.">
+  <meta name="application-name" content="Gotus 2.2.0">
+  <meta name="author" content="Gotoo et les contributeurs">
+  <title>Gotus – Jeu de lettres</title>
+  <link rel="license" href="https://github.com/gotoo77/gotus/blob/main/LICENSE">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg?v=2.2.0">
+  <script>
+    try {
+      document.documentElement.classList.toggle(
+        "light",
+        localStorage.getItem("gotus-theme") === "light"
+      );
+    } catch (_) {
+      // Le thème par défaut reste disponible si le stockage est désactivé.
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/gotus.css?v=2.2.0">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au jeu</a>
+
+  <div id="app" class="app">
+    <header class="site-header">
+      <h1><span class="dot" aria-hidden="true"></span>Gotus</h1>
+      <div class="tools">
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          type="button"
+          role="switch"
+          aria-checked="true"
+        >
+          <span class="theme-icon" aria-hidden="true">☾</span>
+          <span class="theme-label">Mode sombre</span>
+        </button>
+        <button id="newGame" type="button" class="primary">Nouvelle partie</button>
+      </div>
+      <p id="stats" class="stats"></p>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section aria-labelledby="game-title">
+        <h2 id="game-title" class="sr-only">Partie en cours</h2>
+        <div
+          id="board"
+          class="board"
+          role="grid"
+          aria-label="Grille du jeu, 6 lignes et 6 colonnes"
+          aria-describedby="game-help"
+        ></div>
+        <p id="hint" class="hint" role="status" aria-atomic="true">
+          Trouvez le mot de 6 lettres. La première lettre est donnée.
+        </p>
+        <p id="resultSummary" class="result-summary" role="status" aria-atomic="true"></p>
+        <p id="game-help" class="game-help">
+          Utilisez le clavier ou les boutons ci-dessous. Entrée valide le mot et Retour arrière efface une lettre.
+        </p>
+        <div id="keyboard" class="keyboard" role="group" aria-label="Clavier virtuel"></div>
+      </section>
+
+      <section class="legend" aria-labelledby="legend-title">
+        <h2 id="legend-title">Légende</h2>
+        <ul>
+          <li><span class="legend-cell correct" aria-hidden="true">A</span> Lettre bien placée</li>
+          <li><span class="legend-cell present" aria-hidden="true">A</span> Lettre présente ailleurs</li>
+          <li><span class="legend-cell absent" aria-hidden="true">A</span> Lettre absente</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <button id="rules" class="link-button" type="button">Règles du jeu</button>
+      <span aria-hidden="true">•</span>
+      <button id="about" class="link-button" type="button" aria-keyshortcuts="Alt+V">À propos</button>
+      <span aria-hidden="true">•</span>
+      <a href="https://gotoo77.github.io/gotus/versions/">Versions</a>
+      <span aria-hidden="true">•</span>
+      <a href="https://github.com/gotoo77/gotus" target="_blank" rel="noopener">
+        Code source <span class="sr-only">(nouvel onglet)</span>
+      </a>
+    </footer>
+  </div>
+
+  <div
+    id="modal"
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-text"
+    hidden
+  >
+    <div class="modal-box" tabindex="-1">
+      <h2 id="modal-title">Information</h2>
+      <div id="modal-text" class="modal-text"></div>
+      <div class="modal-buttons">
+        <button id="modal-ok" type="button">Fermer</button>
+      </div>
     </div>
   </div>
- </div>
- <body>
-  <div class='app'>
-   <header>
-    <h1>
-     <span class='dot'></span>Gotus
-    </h1>
-    <div class='tools'>
-     <button id='themeToggle' aria-label='Changer le thème'>🌗</button>
-     <div id='stats'></div>
-     <button id='newGame' class='primary'>Nouvelle partie</button>
-    </div>
-   </header>
-   <main>
-    <div id='board' class='board' aria-label='Grille du jeu'></div>
-    <p id='hint' class='hint'>Trouve le mot de 6 lettres. Entrée pour valider, ⌫ pour effacer. 1ʳᵉ lettre donnée.</p>
-    <div id='keyboard' class='keyboard' aria-label='Clavier virtuel'></div>
-   </main>
-   <footer>
-    <a href='#' id='rules'>Règles</a>
-    <span>•</span>
-    <a href='https://pages.github.com/' target='_blank' rel='noopener'>GitHub Pages</a>
-   </footer>
-  </div>
-  <audio id='sfx-ok' src='assets/sounds/ok.wav' preload='auto'></audio>
-  <audio id='sfx-present' src='assets/sounds/present.wav' preload='auto'></audio>
-  <audio id='sfx-absent' src='assets/sounds/absent.wav' preload='auto'></audio>
-  <audio id='sfx-victory' src='assets/sounds/victory.wav' preload='auto'></audio>
-  <audio id='sfx-defeat' src='assets/sounds/defeat.wav' preload='auto'></audio>
-  <audio id="sfx-wrong" src="assets/sounds/wrong.wav" preload="auto"></audio>
 
-  <script type="module" src="logger.js"></script>
-  <script type="module" src="script.js"></script>
+  <audio id="sfx-ok" src="assets/sounds/ok.wav" preload="auto" aria-hidden="true"></audio>
+  <audio id="sfx-present" src="assets/sounds/present.wav" preload="auto" aria-hidden="true"></audio>
+  <audio id="sfx-absent" src="assets/sounds/absent.wav" preload="auto" aria-hidden="true"></audio>
+  <audio id="sfx-victory" src="assets/sounds/victory.wav" preload="auto" aria-hidden="true"></audio>
+  <audio id="sfx-defeat" src="assets/sounds/defeat.wav" preload="auto" aria-hidden="true"></audio>
+  <audio id="sfx-wrong" src="assets/sounds/wrong.wav" preload="auto" aria-hidden="true"></audio>
 
+  <script type="module" src="assets/js/gotus.js?v=2.2.0"></script>
 </body>
 </html>

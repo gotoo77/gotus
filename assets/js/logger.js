@@ -1,8 +1,14 @@
-// logger.js — Gotus visual logger 🎛️
+/**
+ * Gotus — console visuelle de développement.
+ * @version 2.2.0
+ * @author Gotoo et les contributeurs
+ * @license MIT
+ */
 const LEVELS = { D: 0, I: 1, W: 2, E: 3 };
-let CURRENT_LEVEL = LEVELS.D;
+let CURRENT_LEVEL = LEVELS.I;
 let panel = null;
 let container = null;
+let focusBeforePanel = null;
 
 // 🖍️ couleurs console
 function color(level) {
@@ -26,29 +32,39 @@ function ensurePanel() {
     if (panel) return;
     panel = document.createElement("div");
     panel.id = "gotus-log-panel";
+    panel.setAttribute("role", "region");
+    panel.setAttribute("aria-label", "Journal de développement");
+    panel.tabIndex = -1;
     panel.innerHTML = `
         <div id="gotus-log-header">
             <span>🧩 LOG</span>
-            <select id="gotus-log-filter">
+            <select id="gotus-log-filter" aria-label="Niveau minimal des messages">
                 <option value="D">DEBUG</option>
                 <option value="I" selected>INFO+</option>
                 <option value="W">WARN+</option>
                 <option value="E">ERROR</option>
             </select>
-            <button id="gotus-log-clear">Clear</button>
+            <button id="gotus-log-clear" type="button">Effacer</button>
+            <button id="gotus-log-close" type="button" aria-label="Fermer le journal">×</button>
         </div>
-        <div id="gotus-log-body"></div>
+        <div id="gotus-log-body" role="log" aria-label="Messages enregistrés"></div>
     `;
     document.body.appendChild(panel);
     container = panel.querySelector("#gotus-log-body");
     document.getElementById("gotus-log-clear").onclick = () => (container.innerHTML = "");
+    document.getElementById("gotus-log-close").onclick = closePanel;
     document.getElementById("gotus-log-filter").onchange = (e) => setLevel(e.target.value);
+}
+
+function closePanel() {
+    if (!panel?.classList.contains("visible")) return;
+    panel.classList.remove("visible");
+    focusBeforePanel?.focus?.();
 }
 
 // 🧱 insertion d’une ligne dans le panneau
 function appendToPanel(level, msg) {
     ensurePanel();
-    if (LEVELS[level] < CURRENT_LEVEL) return;
     const div = document.createElement("div");
     div.className = `log-line level-${level}`;
     div.textContent = `[${timestamp()}] [${level}] ${msg}`;
@@ -72,7 +88,6 @@ function refreshPanelVisibility() {
 
 // 🪵 fonction principale
 function _log(level, ...args) {
-    if (LEVELS[level] < CURRENT_LEVEL) return;
     const txt = args.map(a => (typeof a === "object" ? JSON.stringify(a) : a)).join(" ");
     console.log(`%c[${timestamp()}] [${level}]`, color(level), ...args);
     appendToPanel(level, txt);
@@ -106,7 +121,16 @@ document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
         e.preventDefault(); // évite le raccourci "focus barre d’adresse"
         ensurePanel();
-        panel.classList.toggle("visible");
+        const willOpen = !panel.classList.contains("visible");
+        if (willOpen) {
+            focusBeforePanel = document.activeElement;
+            panel.classList.add("visible");
+            panel.focus();
+        } else {
+            closePanel();
+        }
         LOG_I("🪶 Panneau de logs " + (panel.classList.contains("visible") ? "ouvert" : "fermé"));
+    } else if (e.key === "Escape" && panel?.classList.contains("visible")) {
+        closePanel();
     }
 });

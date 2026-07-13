@@ -1,0 +1,99 @@
+{
+  "project": {
+    "name": "gotus",
+    "type": "web",
+    "lang": "fr",
+    "icon": "🎯",
+    "timeout": 600
+  },
+  "menus": {
+    "main": {
+      "title": "Menu Principal",
+      "items": [
+        {
+          "label": "Lancer le serveur local",
+          "icon": "🌐",
+          "key": "s",
+          "command": "npm run dev"
+        },
+        {
+          "label": "Toutes les vérifications",
+          "icon": "✅",
+          "key": "v",
+          "command": "npm run check"
+        },
+        {
+          "label": "Tests",
+          "icon": "🧪",
+          "key": "t",
+          "command": "npm test"
+        },
+        {
+          "label": "Outils du projet",
+          "icon": "🛠️",
+          "key": "o",
+          "submenu": "tools"
+        },
+        {
+          "label": "Git branches",
+          "icon": "🌿",
+          "key": "g",
+          "submenu": "auto:git"
+        },
+        {
+          "label": "Historique",
+          "icon": "🕘",
+          "key": "h",
+          "action": "history"
+        },
+        {
+          "label": "Quitter",
+          "icon": "🚪",
+          "key": "x",
+          "action": "exit"
+        }
+      ]
+    },
+    "tools": {
+      "title": "Outils du projet",
+      "items": [
+        {
+          "label": "Régénérer le dictionnaire",
+          "icon": "📚",
+          "key": "d",
+          "command": "npm run dictionary"
+        },
+        {
+          "label": "Régénérer les sons",
+          "icon": "🔊",
+          "key": "s",
+          "command": "npm run sounds"
+        },
+        {
+          "label": "Générer les informations de version",
+          "icon": "🏷️",
+          "key": "v",
+          "command": "npm run build-info"
+        },
+        {
+          "label": "Construire le site Pages multi-version",
+          "icon": "🚀",
+          "key": "p",
+          "command": "npm run build:pages"
+        },
+        {
+          "label": "Valider le HTML",
+          "icon": "🧱",
+          "key": "h",
+          "command": "npm run validate:html"
+        },
+        {
+          "label": "Afficher les statistiques du dictionnaire",
+          "icon": "📊",
+          "key": "i",
+          "command": "python3 -c \"import json; d=json.load(open('assets/data/dictionary.fr-6.json')); print(f'{len(d[\\\"answers\\\"])} réponses / {len(d[\\\"words\\\"])} mots acceptés')\""
+        }
+      ]
+    }
+  }
+}

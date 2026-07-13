@@ -1,0 +1,20 @@
+{
+  "name": "gotus",
+  "version": "2.2.0",
+  "private": true,
+  "type": "module",
+  "gotus": {
+    "release": "Lexique & accessibilité",
+    "channel": "development"
+  },
+  "scripts": {
+    "dev": "python3 -m http.server 8080 --bind localhost",
+    "check": "node --check assets/js/gotus.js && node --check assets/js/logger.js && npm test",
+    "test": "node --test && python3 -m unittest discover -s tests -p '*_test.py'",
+    "build:pages": "python3 scripts/build_pages.py",
+    "dictionary": "python3 scripts/build_dictionary.py",
+    "build-info": "python3 scripts/build_version.py",
+    "sounds": "python3 scripts/generate_sounds.py presets",
+    "validate:html": "npx --yes html-validate@latest index.html"
+  }
+}
