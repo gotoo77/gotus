@@ -14,7 +14,16 @@ Gotus est un jeu de lettres inspiré de Motus et Wordle, réalisé en HTML, CSS 
 - historique des parties et statistiques dans `localStorage` ;
 - panneau de logs intégré, accessible avec `Ctrl + L` ou `Cmd + L` ;
 - interface responsive et utilisable au clavier ;
-- thème clair/sombre persistant, contrastes renforcés et états différenciés autrement que par la couleur.
+- thème clair/sombre persistant, contrastes renforcés et états différenciés autrement que par la couleur ;
+- générique original de jeu télévisé rétro, jouable à la première visite et entièrement facultatif.
+
+## Générique d’introduction
+
+Le générique est proposé une fois lors de la première visite, après la préparation de la partie. Le jeu reste verrouillé jusqu’à sa fin. Il peut être passé avec le bouton **Passer** ou la touche `Échap`, puis rejoué à tout moment avec **Revoir le générique** dans le pied de page ou la fenêtre **À propos**.
+
+La fenêtre **À propos** permet aussi de désactiver ou réactiver son affichage automatique. Une réactivation le proposera au prochain chargement. Les préférences utilisent les clés versionnées `gotus-intro-seen-v1` et `gotus-intro-enabled-v1`; un stockage local indisponible n’empêche ni le jeu ni le générique de fonctionner.
+
+Avec `prefers-reduced-motion: reduce`, la chorégraphie est remplacée par une apparition sobre de 650 ms, sans signature sonore. Le bouton de passage reste disponible et le focus revient au jeu à la fin.
 
 ## Lancer le projet
 
@@ -44,7 +53,7 @@ gotus/
 │   ├── css/gotus.css        Thèmes, responsive et animations
 │   ├── data/                Configuration et dictionnaire généré
 │   ├── images/favicon.svg   Icône du site
-│   ├── js/                  Application, moteur et logger
+│   ├── js/                  Application, générique, moteur et logger
 │   └── sounds/              Effets sonores
 ├── scripts/                 Générateurs du dictionnaire et des sons
 ├── tests/                   Tests JavaScript et Python
@@ -56,7 +65,7 @@ gotus/
 
 ## Configuration
 
-Les chemins des sons, le délai entre les sons et le thème par défaut sont modifiables dans `assets/data/config.json` :
+Les chemins des sons, le délai entre les sons, la durée du générique et le thème par défaut sont modifiables dans `assets/data/config.json` :
 
 ```json
 {
@@ -71,9 +80,25 @@ Les chemins des sons, le délai entre les sons et le thème par défaut sont mod
   "timing": {
     "letterDelay": 300
   },
+  "intro": {
+    "duration": 5900,
+    "sound": {
+      "opening": "assets/sounds/intro-opening.wav",
+      "whoosh": "assets/sounds/intro-whoosh.wav",
+      "bounce": "assets/sounds/intro-bounce.wav",
+      "intruder": "assets/sounds/intro-intruder.wav",
+      "impact": "assets/sounds/intro-impact.wav",
+      "letter": "assets/sounds/intro-letter.wav",
+      "lock": "assets/sounds/intro-lock.wav",
+      "eject": "assets/sounds/intro-eject.wav",
+      "signature": "assets/sounds/intro-signature.wav"
+    }
+  },
   "theme": "dark"
 }
 ```
+
+La durée est exprimée en millisecondes. Les fichiers WAV sont des synthèses originales générées avec `npm run sounds`; leur absence ou le blocage de la lecture automatique ne modifie pas la chronologie visuelle.
 
 ## Dictionnaire
 

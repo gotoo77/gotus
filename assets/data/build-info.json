@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "product": "Gotus",
-  "version": "2.2.0",
-  "release": "Lexique & accessibilité",
-  "channel": "development",
-  "buildDate": "2026-07-13T19:05:49Z",
-  "commit": "ba3f5df2-dirty"
+  "version": "2.3.0",
+  "release": "Le générique",
+  "channel": "stable",
+  "buildDate": "2026-07-13T19:57:18Z",
+  "commit": "2137240c-dirty"
 }

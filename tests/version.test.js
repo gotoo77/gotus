@@ -13,6 +13,7 @@ const versionedSources = await Promise.all([
     '../index.html',
     '../assets/css/gotus.css',
     '../assets/js/gotus.js',
+    '../assets/js/intro.js',
     '../assets/js/game-logic.js',
     '../assets/js/logger.js',
     '../assets/images/favicon.svg'

@@ -18,6 +18,7 @@ VERSIONED_SOURCES = (
     ROOT / "index.html",
     ROOT / "assets/css/gotus.css",
     ROOT / "assets/js/gotus.js",
+    ROOT / "assets/js/intro.js",
     ROOT / "assets/js/game-logic.js",
     ROOT / "assets/js/logger.js",
     ROOT / "assets/images/favicon.svg",
@@ -63,12 +64,12 @@ def synchronize_source_versions(version: str) -> list[Path]:
     """Synchronise les en-têtes et les clés anti-cache des fichiers publics."""
     changed = []
     for path in VERSIONED_SOURCES:
-        content = path.read_text(encoding="utf-8")
+        content = path.read_bytes().decode("utf-8")
         updated = content
         for pattern in VERSION_PATTERNS:
             updated = pattern.sub(version, updated)
         if updated != content:
-            path.write_text(updated, encoding="utf-8")
+            path.write_bytes(updated.encode("utf-8"))
             changed.append(path)
     return changed
 

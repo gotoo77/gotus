@@ -11,5 +11,19 @@
   "timing": {
     "letterDelay": 300
   },
+  "intro": {
+    "duration": 5900,
+    "sound": {
+      "opening": "assets/sounds/intro-opening.wav",
+      "whoosh": "assets/sounds/intro-whoosh.wav",
+      "bounce": "assets/sounds/intro-bounce.wav",
+      "intruder": "assets/sounds/intro-intruder.wav",
+      "impact": "assets/sounds/intro-impact.wav",
+      "letter": "assets/sounds/intro-letter.wav",
+      "lock": "assets/sounds/intro-lock.wav",
+      "eject": "assets/sounds/intro-eject.wav",
+      "signature": "assets/sounds/intro-signature.wav"
+    }
+  },
   "theme": "dark"
 }

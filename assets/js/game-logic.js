@@ -1,6 +1,6 @@
 /**
  * Gotus — fonctions pures du moteur de jeu.
- * @version 2.2.0
+ * @version 2.3.0
  * @author Gotoo et les contributeurs
  * @license MIT
  */

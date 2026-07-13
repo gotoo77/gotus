@@ -1,15 +1,15 @@
 {
   "name": "gotus",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "type": "module",
   "gotus": {
-    "release": "Lexique & accessibilité",
-    "channel": "development"
+    "release": "Le générique",
+    "channel": "stable"
   },
   "scripts": {
     "dev": "python3 -m http.server 8080 --bind localhost",
-    "check": "node --check assets/js/gotus.js && node --check assets/js/logger.js && npm test",
+    "check": "node --check assets/js/gotus.js && node --check assets/js/intro.js && node --check assets/js/logger.js && npm test",
     "test": "node --test && python3 -m unittest discover -s tests -p '*_test.py'",
     "build:pages": "python3 scripts/build_pages.py",
     "dictionary": "python3 scripts/build_dictionary.py",

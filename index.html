@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Gotus — point d’entrée de l’application.
-  @version 2.2.0
+  @version 2.3.0
   @author Gotoo et les contributeurs
   @license MIT
 -->
@@ -10,11 +10,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Gotus, un jeu gratuit de lettres françaises en six essais.">
-  <meta name="application-name" content="Gotus 2.2.0">
+  <meta name="application-name" content="Gotus 2.3.0">
   <meta name="author" content="Gotoo et les contributeurs">
   <title>Gotus – Jeu de lettres</title>
   <link rel="license" href="https://github.com/gotoo77/gotus/blob/main/LICENSE">
-  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg?v=2.2.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg?v=2.3.0">
   <script>
     try {
       document.documentElement.classList.toggle(
@@ -25,7 +25,7 @@
       // Le thème par défaut reste disponible si le stockage est désactivé.
     }
   </script>
-  <link rel="stylesheet" href="assets/css/gotus.css?v=2.2.0">
+  <link rel="stylesheet" href="assets/css/gotus.css?v=2.3.0">
 </head>
 <body>
   <a class="skip-link" href="#main">Aller au jeu</a>
@@ -84,6 +84,8 @@
       <span aria-hidden="true">•</span>
       <button id="about" class="link-button" type="button" aria-keyshortcuts="Alt+V">À propos</button>
       <span aria-hidden="true">•</span>
+      <button id="replayIntro" class="link-button" type="button">Revoir le générique</button>
+      <span aria-hidden="true">•</span>
       <a href="https://gotoo77.github.io/gotus/versions/">Versions</a>
       <span aria-hidden="true">•</span>
       <a href="https://github.com/gotoo77/gotus" target="_blank" rel="noopener">
@@ -117,6 +119,6 @@
   <audio id="sfx-defeat" src="assets/sounds/defeat.wav" preload="auto" aria-hidden="true"></audio>
   <audio id="sfx-wrong" src="assets/sounds/wrong.wav" preload="auto" aria-hidden="true"></audio>
 
-  <script type="module" src="assets/js/gotus.js?v=2.2.0"></script>
+  <script type="module" src="assets/js/gotus.js?v=2.3.0"></script>
 </body>
 </html>
