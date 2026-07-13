@@ -1,11 +1,17 @@
 /**
  * Gotus — application du jeu.
- * @version 2.2.0
+ * @version 2.3.0
  * @author Gotoo et les contributeurs
  * @license MIT
  */
-import { LOG_D, LOG_I, LOG_W, LOG_E } from './logger.js?v=2.2.0';
-import { normalizeWord, playableWords, scoreGuess } from './game-logic.js?v=2.2.0';
+import { LOG_D, LOG_I, LOG_W, LOG_E } from './logger.js?v=2.3.0';
+import { normalizeWord, playableWords, scoreGuess } from './game-logic.js?v=2.3.0';
+import {
+    createIntro,
+    isIntroEnabled,
+    setIntroEnabled,
+    shouldAutoPlayIntro
+} from './intro.js?v=2.3.0';
 
 const WORD_LEN = 6, MAX_TRIES = 6;
 let CONFIG = { timing: { letterDelay: 500 }, theme: "dark" };
@@ -19,9 +25,17 @@ let BUILD_INFO = {
 };
 const THEME_KEY = "gotus-theme";
 
+function browserStorage() {
+    try {
+        return globalThis.localStorage;
+    } catch (_) {
+        return null;
+    }
+}
 
 let modalOnClose = null;
 let focusBeforeModal = null;
+let intro = null;
 
 function showModal(title, text, onClose = null) {
     LOG_I("Modal affichée :", title, text);
@@ -91,6 +105,7 @@ function showAbout() {
         stable: 'Stable'
     };
     const channel = channelLabels[BUILD_INFO.channel] || BUILD_INFO.channel;
+    const introEnabled = isIntroEnabled(browserStorage());
     showModal(
         `À propos de ${BUILD_INFO.product}`,
         `<dl class="build-info">
@@ -101,8 +116,22 @@ function showAbout() {
            <div><dt>Commit</dt><dd><code>${escapeHtml(BUILD_INFO.commit)}</code></dd></div>
            <div><dt>Crédits</dt><dd>Gotoo et les contributeurs · licence MIT</dd></div>
          </dl>
+         <div class="intro-preferences">
+           <label>
+             <input id="intro-auto-enabled" type="checkbox" ${introEnabled ? 'checked' : ''}>
+             Afficher le générique à la première visite
+           </label>
+           <button id="intro-replay-from-about" class="secondary" type="button">Revoir le générique</button>
+         </div>
          <p class="shortcut-help">Raccourci : <kbd>Alt</kbd> + <kbd>V</kbd></p>`
     );
+    document.getElementById('intro-auto-enabled')?.addEventListener('change', event => {
+        setIntroEnabled(browserStorage(), event.currentTarget.checked);
+    });
+    document.getElementById('intro-replay-from-about')?.addEventListener('click', () => {
+        modalOnClose = replayIntro;
+        closeModal();
+    });
 }
 
 async function j(path) {
@@ -147,6 +176,7 @@ const board = document.getElementById('board'),
 const btnNew = document.getElementById('newGame'),
       rules = document.getElementById('rules'),
       about = document.getElementById('about'),
+      replayIntroButton = document.getElementById('replayIntro'),
       themeToggle = document.getElementById('themeToggle');
 const A = {
     ok: document.getElementById('sfx-ok'),
@@ -175,7 +205,11 @@ const store = {
     },
     set(d) {
         LOG_D("Écriture store :", d);
-        localStorage.setItem('gotus-stats', JSON.stringify(d));
+        try {
+            localStorage.setItem('gotus-stats', JSON.stringify(d));
+        } catch (e) {
+            LOG_W("Erreur écriture localStorage :", e);
+        }
     }
 };
 LOG_I("Store initialisé");
@@ -426,7 +460,14 @@ function onKey(e) {
         if (e.key === 'Escape') closeModal();
         if (e.key === 'Tab') {
             e.preventDefault();
-            document.getElementById('modal-ok').focus();
+            const focusable = [...document.querySelectorAll(
+                '#modal button:not([disabled]), #modal input:not([disabled])'
+            )];
+            const index = focusable.indexOf(document.activeElement);
+            const next = e.shiftKey
+                ? (index <= 0 ? focusable.length - 1 : index - 1)
+                : (index + 1) % focusable.length;
+            focusable[next]?.focus();
         }
         return;
     }
@@ -448,9 +489,11 @@ function sample() {
     return s;
 }
 
-function newGame() {
+function newGame({ locked = false } = {}) {
     LOG_I("Nouvelle partie");
     gameId++;
+    gameLocked = true;
+    target = "";
     try {
         target = sample();
     } catch (error) {
@@ -465,7 +508,27 @@ function newGame() {
     revealFirst();
     hint.textContent = "Trouvez le mot de 6 lettres. La première lettre est donnée.";
     resultSummary.textContent = "";
+    gameLocked = locked;
+}
+
+function unlockGame(activeGame = gameId) {
+    if (activeGame !== gameId || !target) return false;
     gameLocked = false;
+    document.getElementById('main').focus();
+    return true;
+}
+
+async function replayIntro() {
+    if (!intro || intro.active) return;
+    const activeGame = gameId;
+    gameLocked = true;
+    try {
+        await intro.replay();
+    } catch (error) {
+        LOG_W("Générique interrompu :", error);
+    } finally {
+        unlockGame(activeGame);
+    }
 }
 
 function configureAudio() {
@@ -509,8 +572,7 @@ async function boot() {
         LOG_E("Erreur de chargement dictionnaire", e);
         showModal("Erreur", "<p>Impossible de charger le dictionnaire.</p>");
     }
-    makeBoard();
-    newGame();
+    newGame({ locked: true });
     updStats();
     btnNew.onclick = newGame;
     document.addEventListener('keydown', onKey);
@@ -532,11 +594,29 @@ async function boot() {
     };
 
     about.onclick = showAbout;
+    replayIntroButton.onclick = replayIntro;
 
     themeToggle.onclick = () => {
         const theme = getTheme() === "dark" ? "light" : "dark";
         setTheme(theme);
     };
+    intro = createIntro({
+        app: document.getElementById('app'),
+        duration: CONFIG?.intro?.duration,
+        sounds: CONFIG?.intro?.sound
+    });
+    const activeGame = gameId;
+    try {
+        if (target && shouldAutoPlayIntro(browserStorage())) {
+            LOG_I("Lecture du générique d’introduction");
+            await intro.play();
+        }
+    } catch (error) {
+        LOG_W("Le générique n’a pas pu être joué :", error);
+        intro.skip();
+    } finally {
+        unlockGame(activeGame);
+    }
     LOG_I("Interface initialisée");
 }
  
