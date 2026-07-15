@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeWord, playableWords, scoreGuess } from '../assets/js/game-logic.js';
+import {
+    confirmedLettersAfterGuess,
+    normalizeWord,
+    playableWords,
+    scoreGuess
+} from '../assets/js/game-logic.js';
 
 test('normalise les accents et la casse', () => {
     assert.equal(normalizeWord('ÉcRire'), 'ECRIRE');
@@ -22,4 +27,14 @@ test('filtre et déduplique les mots jouables', () => {
     assert.deepEqual(playableWords(['été', 'ETE', 'maison', 'LUMIERE', 'souris'], 6), [
         'MAISON', 'SOURIS'
     ]);
+});
+
+test('mémorise les lettres bien placées pour les réafficher', () => {
+    const confirmed = confirmedLettersAfterGuess(
+        ['M', '', '', '', '', ''],
+        'MARINE',
+        ['correct', 'correct', 'absent', 'present', 'present', 'absent']
+    );
+
+    assert.deepEqual(confirmed, ['M', 'A', '', '', '', '']);
 });

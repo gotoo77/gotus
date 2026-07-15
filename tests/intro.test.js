@@ -20,6 +20,7 @@ class MemoryStorage {
 class FakeClassList {
     values = new Set();
     add(...names) { names.forEach(name => this.values.add(name)); }
+    remove(...names) { names.forEach(name => this.values.delete(name)); }
     contains(name) { return this.values.has(name); }
 }
 
@@ -32,11 +33,16 @@ class FakeElement extends EventTarget {
     classList = new FakeClassList();
     removed = false;
     skipButton = new FakeButton();
+    startButton = new FakeButton();
     attributes = new Map();
     set className(value) { value.split(' ').forEach(name => this.classList.add(name)); }
     set innerHTML(_) {}
     setAttribute(name, value) { this.attributes.set(name, value); }
-    querySelector(selector) { return selector === '.intro-skip' ? this.skipButton : null; }
+    querySelector(selector) {
+        if (selector === '.intro-skip') return this.skipButton;
+        if (selector === '.intro-start') return this.startButton;
+        return null;
+    }
     remove() { this.removed = true; }
 }
 
@@ -142,18 +148,67 @@ test('le bouton et Échap passent immédiatement le générique', async () => {
     }
 });
 
+test('le premier générique sonore attend un geste utilisateur sur desktop', async () => {
+    let playCount = 0;
+    const { document, intro, timers } = controlledIntro({
+        audioFactory: () => ({
+            currentTime: 0,
+            pause() {},
+            play: () => {
+                playCount += 1;
+                return Promise.resolve();
+            }
+        }),
+        duration: 10,
+        sounds: { opening: 'opening.wav' }
+    });
+    const completion = intro.play();
+    assert.equal(document.body.children[0].classList.contains('intro-awaiting'), true);
+    assert.equal(document.body.children[0].startButton.focused, true);
+    assert.equal(playCount, 0);
+    assert.equal(timers.size, 0);
+
+    document.body.children[0].startButton.dispatchEvent(new Event('click'));
+    assert.equal(document.body.children[0].classList.contains('is-playing'), true);
+    assert.equal(playCount, 1);
+    [...timers.values()].find(timer => timer.delay === 10).callback();
+    assert.equal(await completion, 'complete');
+});
+
 test('le mode mouvement réduit affiche seulement la version courte et sans son', async () => {
     let audioCreated = false;
     const { document, intro, timers } = controlledIntro({
         audioFactory: () => { audioCreated = true; },
         matchMedia: () => ({ matches: true }),
-        reducedDuration: 650,
         sounds: { opening: 'opening.wav' }
     });
     const completion = intro.play();
     assert.equal(document.body.children[0].classList.contains('intro-reduced'), true);
     assert.equal(audioCreated, false);
-    [...timers.values()].find(timer => timer.delay === 650).callback();
+    [...timers.values()].find(timer => timer.delay === 1500).callback();
+    assert.equal(await completion, 'complete');
+});
+
+test('le rejeu manuel lance la version complète même avec mouvement réduit', async () => {
+    let audioCreated = false;
+    const { document, intro, timers } = controlledIntro({
+        audioFactory: () => ({
+            currentTime: 0,
+            pause() {},
+            play: () => {
+                audioCreated = true;
+                return Promise.resolve();
+            }
+        }),
+        duration: 5900,
+        matchMedia: () => ({ matches: true }),
+        sounds: { opening: 'opening.wav' }
+    });
+    const completion = intro.replay();
+    assert.equal(document.body.children[0].classList.contains('intro-reduced'), false);
+    assert.equal(document.body.children[0].classList.contains('intro-full-motion'), true);
+    assert.equal(audioCreated, true);
+    [...timers.values()].find(timer => timer.delay === 5900).callback();
     assert.equal(await completion, 'complete');
 });
 
@@ -167,7 +222,7 @@ test('un rejet audio ne gouverne jamais la chronologie', async () => {
         duration: 10,
         sounds: { opening: 'opening.wav' }
     });
-    const completion = intro.play();
+    const completion = intro.replay();
     [...timers.values()].find(timer => timer.delay === 10).callback();
     assert.equal(await completion, 'complete');
 });

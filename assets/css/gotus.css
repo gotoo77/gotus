@@ -228,6 +228,13 @@ h1 .dot {
   animation: status-pop 180ms ease-out;
 }
 
+.cell.confirmed:not(.evaluated) {
+  border-color: var(--correct);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--correct) 32%, var(--cell)), var(--cell));
+  color: var(--text);
+}
+
 .cell.correct,
 .legend-cell.correct {
   border-style: solid;
@@ -443,6 +450,11 @@ a,
   animation: intro-curtain 5.9s both;
 }
 
+.intro-overlay.is-playing .intro-start-panel {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .intro-stage {
   position: absolute;
   inset: max(3rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
@@ -628,6 +640,35 @@ a,
   font-weight: 800;
 }
 
+.intro-start-panel {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.intro-awaiting .intro-start-panel {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.intro-start {
+  min-width: min(20rem, calc(100vw - 3rem));
+  padding: 0.85rem 1.3rem;
+  border: 2px solid var(--focus);
+  border-radius: 999px;
+  background: var(--correct);
+  color: #fff;
+  box-shadow: 0 0.9rem 2rem var(--shadow);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
 .intro-accessible-copy {
   position: absolute;
   width: 1px;
@@ -751,7 +792,7 @@ a,
 }
 
 .intro-reduced .intro-o-black { display: none; }
-.intro-reduced.is-playing { animation-duration: 0.65s; }
+.intro-reduced.is-playing { animation-duration: 1.5s; }
 .intro-reduced .intro-stage * { animation: none !important; }
 
 footer a,
@@ -1023,8 +1064,27 @@ kbd {
   }
 
   .intro-reduced.is-playing {
-    animation: intro-curtain 650ms both !important;
+    animation: intro-curtain 1500ms both !important;
   }
+
+  .intro-full-motion.is-playing { animation-duration: 5.9s !important; }
+  .intro-full-motion.is-playing .intro-orbit { animation-duration: 4.2s !important; }
+  .intro-full-motion.is-playing .intro-ball-red { animation-duration: 2.1s !important; }
+  .intro-full-motion.is-playing .intro-ball-yellow-a { animation-duration: 3.5s !important; }
+  .intro-full-motion.is-playing .intro-ball-yellow-b { animation-duration: 3.1s !important; }
+  .intro-full-motion.is-playing .intro-ball-blue-a { animation-duration: 3.4s !important; }
+  .intro-full-motion.is-playing .intro-ball-blue-b { animation-duration: 2.8s !important; }
+  .intro-full-motion.is-playing .intro-ball-black { animation-duration: 2s !important; }
+  .intro-full-motion.is-playing .intro-ball-kicker { animation-duration: 1.2s !important; }
+  .intro-full-motion.is-playing .intro-letter-g,
+  .intro-full-motion.is-playing .intro-letter-t,
+  .intro-full-motion.is-playing .intro-letter-u,
+  .intro-full-motion.is-playing .intro-letter-s { animation-duration: 0.55s !important; }
+  .intro-full-motion.is-playing .intro-o-slot { animation-duration: 0.1s !important; }
+  .intro-full-motion.is-playing .intro-o-black { animation-duration: 1.25s !important; }
+  .intro-full-motion.is-playing .intro-o-final { animation-duration: 0.5s !important; }
+  .intro-full-motion.is-playing .intro-logo { animation-duration: 0.72s !important; }
+  .intro-full-motion.is-playing .intro-tagline { animation-duration: 0.65s !important; }
 }
 
 @media (forced-colors: active) {

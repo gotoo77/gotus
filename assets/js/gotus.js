@@ -5,7 +5,12 @@
  * @license MIT
  */
 import { LOG_D, LOG_I, LOG_W, LOG_E } from './logger.js?v=2.3.0';
-import { normalizeWord, playableWords, scoreGuess } from './game-logic.js?v=2.3.0';
+import {
+    confirmedLettersAfterGuess,
+    normalizeWord,
+    playableWords,
+    scoreGuess
+} from './game-logic.js?v=2.3.0';
 import {
     createIntro,
     isIntroEnabled,
@@ -188,7 +193,12 @@ const A = {
 };
 
 let ANSWERS_RAW = [], WORDS_SET = new Set();
-let target = "", row = 0, col = 1, grid = [], current = new Array(WORD_LEN).fill("");
+let target = "",
+    row = 0,
+    col = 1,
+    grid = [],
+    current = new Array(WORD_LEN).fill(""),
+    confirmedLetters = new Array(WORD_LEN).fill("");
 let gameLocked = true, gameId = 0;
 const keyboardButtons = new Map();
 const keyRanks = { absent: 1, present: 2, correct: 3 };
@@ -271,13 +281,33 @@ function describeCell(rowIndex, columnIndex, letter = '', status = '') {
     grid[rowIndex][columnIndex].setAttribute('aria-label', details.join(', '));
 }
 
+function isCurrentComplete() {
+    return current.every(Boolean);
+}
+
+function prepareCurrentRow(rowIndex) {
+    current = new Array(WORD_LEN).fill("");
+    confirmedLetters.forEach((letter, index) => {
+        if (!letter) return;
+        const cell = grid[rowIndex]?.[index];
+        if (!cell) return;
+        cell.textContent = letter;
+        cell.classList.add('confirmed');
+        describeCell(rowIndex, index, letter, 'correct');
+    });
+    current[0] = confirmedLetters[0];
+    col = 1;
+}
+
 function revealFirst() {
     LOG_D("Révélation première lettre :", target[0]);
-    grid[0][0].textContent = target[0];
-    describeCell(0, 0, target[0]);
-    current = new Array(WORD_LEN).fill("");
-    current[0] = target[0];
-    col = 1;
+    confirmedLetters = new Array(WORD_LEN).fill("");
+    confirmedLetters[0] = target[0];
+    prepareCurrentRow(0);
+}
+
+function rememberConfirmedLetters(guess, mask) {
+    confirmedLetters = confirmedLettersAfterGuess(confirmedLetters, guess, mask);
 }
 
 const KEY_ROWS = [
@@ -334,6 +364,7 @@ function char(ch) {
         const cell = grid[row][col];
         if (!cell) return;
         cell.textContent = ch;
+        cell.classList.remove('confirmed');
         describeCell(row, col, ch);
         cell.classList.add('reveal');
         setTimeout(() => {
@@ -349,8 +380,13 @@ function back() {
         col--;
         LOG_D("Suppression lettre à col", col);
         current[col] = "";
-        grid[row][col].textContent = "";
-        describeCell(row, col);
+        grid[row][col].textContent = confirmedLetters[col] || "";
+        if (confirmedLetters[col]) {
+            grid[row][col].classList.add('confirmed');
+            describeCell(row, col, confirmedLetters[col], 'correct');
+        } else {
+            describeCell(row, col);
+        }
     }
 }
 
@@ -401,7 +437,7 @@ function validWord(guess) {
 
 async function enter() {
     if (gameLocked) return;
-    if (col < WORD_LEN) {
+    if (!isCurrentComplete()) {
         hint.textContent = "Mot incomplet…";
         LOG_W("Mot incomplet");
         return;
@@ -426,6 +462,7 @@ async function enter() {
     const absentCount = mask.filter(status => status === 'absent').length;
     const revealed = await revealGuess(guess, mask, row, activeGame);
     if (!revealed) return;
+    rememberConfirmedLetters(guess, mask);
     resultSummary.textContent = `Résultat : ${correctCount} bien placée${correctCount !== 1 ? 's' : ''}, ${presentCount} présente${presentCount !== 1 ? 's' : ''} ailleurs et ${absentCount} absente${absentCount !== 1 ? 's' : ''}.`;
 
     if (norm(guess) === norm(target)) {
@@ -446,11 +483,7 @@ async function enter() {
         return;
     }
 
-    col = 1;
-    current = new Array(WORD_LEN).fill("");
-    current[0] = target[0];
-    grid[row][0].textContent = target[0];
-    describeCell(row, 0, target[0]);
+    prepareCurrentRow(row);
     hint.textContent = `${MAX_TRIES - row} essai${MAX_TRIES - row > 1 ? 's' : ''} restant${MAX_TRIES - row > 1 ? 's' : ''}.`;
     gameLocked = false;
 }
@@ -503,6 +536,7 @@ function newGame({ locked = false } = {}) {
         return;
     }
     row = 0; col = 1;
+    confirmedLetters = new Array(WORD_LEN).fill("");
     makeBoard();
     makeKeyboard();
     revealFirst();
@@ -589,6 +623,7 @@ async function boot() {
            <li><strong>Bien placée :</strong> la lettre est à la bonne position.</li>
            <li><strong>Présente ailleurs :</strong> la lettre existe à une autre position.</li>
            <li><strong>Absente :</strong> la lettre n’est pas dans le mot.</li>
+           <li>Les lettres déjà bien placées sont rappelées sur les essais suivants, mais seule la première lettre est imposée.</li>
          </ul>`
       );
     };
@@ -603,6 +638,17 @@ async function boot() {
     intro = createIntro({
         app: document.getElementById('app'),
         duration: CONFIG?.intro?.duration,
+        onEvent: event => {
+            if (event.type === 'start') {
+                LOG_I(
+                    "Générique démarré :",
+                    event.reduced ? "version réduite" : "version complète",
+                    `${event.duration} ms`
+                );
+            } else if (event.type === 'finish') {
+                LOG_I("Générique terminé :", event.reason);
+            }
+        },
         sounds: CONFIG?.intro?.sound
     });
     const activeGame = gameId;

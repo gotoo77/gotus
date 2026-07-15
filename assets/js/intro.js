@@ -103,6 +103,9 @@ function introMarkup() {
         <h2 id="intro-title">GOTUS</h2>
         <p>Générique d'introduction.</p>
       </div>
+      <div class="intro-start-panel">
+        <button class="intro-start" type="button">Lancer le générique</button>
+      </div>
       <button class="intro-skip" type="button">Passer</button>`;
 }
 
@@ -115,7 +118,8 @@ export function createIntro(options = {}) {
     const audioFactory = options.audioFactory ?? (source => new Audio(source));
     const sounds = options.sounds ?? {};
     const duration = options.duration ?? 5900;
-    const reducedDuration = options.reducedDuration ?? 650;
+    const reducedDuration = options.reducedDuration ?? 1500;
+    const onEvent = options.onEvent ?? (() => {});
     const setTimer = options.setTimeout ?? globalThis.setTimeout.bind(globalThis);
     const clearTimer = options.clearTimeout ?? globalThis.clearTimeout.bind(globalThis);
     const nextFrame = options.requestAnimationFrame
@@ -124,6 +128,14 @@ export function createIntro(options = {}) {
 
     let current = null;
     let destroyed = false;
+
+    function emit(type, details = {}) {
+        try {
+            onEvent({ type, ...details });
+        } catch (_) {
+            // Les diagnostics ne doivent jamais casser le générique.
+        }
+    }
 
     function reducedMotion() {
         try {
@@ -172,6 +184,7 @@ export function createIntro(options = {}) {
         active.audio.forEach(stopAudio);
         active.element.remove();
         if (app) app.inert = active.previousInert;
+        emit('finish', { reason });
         active.resolve(reason);
     }
 
@@ -181,8 +194,10 @@ export function createIntro(options = {}) {
 
         const controller = new AbortController();
         const element = doc.createElement('section');
-        const isReduced = reducedMotion();
-        element.className = `intro-overlay${isReduced ? ' intro-reduced' : ''}`;
+        const isReduced = !manual && reducedMotion();
+        const hasAudio = INTRO_AUDIO_CUES.some(cue => Boolean(sounds[cue.sound]));
+        const waitsForGesture = !manual && !isReduced && hasAudio;
+        element.className = `intro-overlay${manual ? ' intro-full-motion' : ''}${isReduced ? ' intro-reduced' : ''}${waitsForGesture ? ' intro-awaiting' : ''}`;
         element.setAttribute('role', 'dialog');
         element.setAttribute('aria-modal', 'true');
         element.setAttribute('aria-labelledby', 'intro-title');
@@ -204,7 +219,11 @@ export function createIntro(options = {}) {
         if (app) app.inert = true;
         mount.appendChild(element);
         const skipButton = element.querySelector('.intro-skip');
+        const startButton = element.querySelector('.intro-start');
         skipButton?.addEventListener('click', () => finish('skipped'), {
+            signal: controller.signal
+        });
+        startButton?.addEventListener('click', () => startSequence({ userGesture: true }), {
             signal: controller.signal
         });
         doc.addEventListener('keydown', event => {
@@ -213,25 +232,45 @@ export function createIntro(options = {}) {
                 finish('skipped');
             } else if (event.key === 'Tab') {
                 event.preventDefault();
-                skipButton?.focus();
+                if (waitsForGesture && doc.activeElement === startButton) skipButton?.focus();
+                else if (waitsForGesture) startButton?.focus();
+                else skipButton?.focus();
             }
         }, { signal: controller.signal });
         doc.addEventListener('visibilitychange', () => {
             if (doc.hidden) finish('hidden');
         }, { signal: controller.signal });
 
-        skipButton?.focus();
-        nextFrame(() => {
-            if (current?.element === element) element.classList.add('is-playing');
-        });
+        if (startButton) startButton.hidden = !waitsForGesture;
+        (waitsForGesture ? startButton : skipButton)?.focus();
 
-        if (!isReduced) {
-            INTRO_AUDIO_CUES.forEach(cue => {
-                if (cue.at === 0) playAudio(sounds[cue.sound]);
-                else schedule(() => playAudio(sounds[cue.sound]), cue.at);
+        function startSequence({ userGesture = false } = {}) {
+            if (!current || current.element !== element || current.started) return;
+            current.started = true;
+            element.classList.remove?.('intro-awaiting');
+            const playbackDuration = isReduced ? reducedDuration : duration;
+            emit('start', {
+                duration: playbackDuration,
+                manual,
+                reduced: isReduced,
+                userGesture
             });
+            const startAnimations = () => {
+                if (current?.element === element) element.classList.add('is-playing');
+            };
+            if (userGesture) startAnimations();
+            else nextFrame(startAnimations);
+
+            if (!isReduced) {
+                INTRO_AUDIO_CUES.forEach(cue => {
+                    if (cue.at === 0) playAudio(sounds[cue.sound]);
+                    else schedule(() => playAudio(sounds[cue.sound]), cue.at);
+                });
+            }
+            schedule(() => finish('complete'), playbackDuration);
         }
-        schedule(() => finish('complete'), isReduced ? reducedDuration : duration);
+
+        if (!waitsForGesture) startSequence();
         return promise;
     }
 

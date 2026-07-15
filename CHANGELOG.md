@@ -6,6 +6,11 @@ Toutes les évolutions notables de Gotus sont regroupées dans ce fichier. Le pr
 
 Les évolutions importantes en cours sont ajoutées ici au moment où elles sont développées. Cette section est transférée sous un numéro de version lors de la prochaine release.
 
+### Corrigé
+
+- le générique sonore attend désormais une action explicite au premier affichage, afin de respecter les politiques d’autoplay des navigateurs desktop sans perdre la synchronisation audio.
+- les lettres déjà bien placées sont désormais réaffichées comme repères dans les essais suivants, sans empêcher de proposer un autre mot compatible avec la première lettre.
+
 ## [2.3.0] — Le générique — 13 juillet 2026
 
 ### Ajouté

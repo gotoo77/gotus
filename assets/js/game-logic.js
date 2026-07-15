@@ -45,6 +45,14 @@ export function scoreGuess(guess, target) {
     return result;
 }
 
+export function confirmedLettersAfterGuess(previous, guess, mask) {
+    const confirmed = [...previous];
+    mask.forEach((status, index) => {
+        if (status === 'correct') confirmed[index] = normalizeWord(guess)[index];
+    });
+    return confirmed;
+}
+
 export function playableWords(words, length) {
     return [...new Set(words.map(normalizeWord))]
         .filter(word => word.length === length && /^[A-Z]+$/.test(word));

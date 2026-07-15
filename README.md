@@ -19,11 +19,11 @@ Gotus est un jeu de lettres inspiré de Motus et Wordle, réalisé en HTML, CSS 
 
 ## Générique d’introduction
 
-Le générique est proposé une fois lors de la première visite, après la préparation de la partie. Le jeu reste verrouillé jusqu’à sa fin. Il peut être passé avec le bouton **Passer** ou la touche `Échap`, puis rejoué à tout moment avec **Revoir le générique** dans le pied de page ou la fenêtre **À propos**.
+Le générique est proposé une fois lors de la première visite, après la préparation de la partie. Lorsque la signature sonore est disponible, le bouton **Lancer le générique** démarre la séquence afin de respecter les politiques audio des navigateurs. Le jeu reste verrouillé jusqu’à sa fin. Il peut être passé avec le bouton **Passer** ou la touche `Échap`, puis rejoué à tout moment avec **Revoir le générique** dans le pied de page ou la fenêtre **À propos**.
 
 La fenêtre **À propos** permet aussi de désactiver ou réactiver son affichage automatique. Une réactivation le proposera au prochain chargement. Les préférences utilisent les clés versionnées `gotus-intro-seen-v1` et `gotus-intro-enabled-v1`; un stockage local indisponible n’empêche ni le jeu ni le générique de fonctionner.
 
-Avec `prefers-reduced-motion: reduce`, la chorégraphie est remplacée par une apparition sobre de 650 ms, sans signature sonore. Le bouton de passage reste disponible et le focus revient au jeu à la fin.
+Avec `prefers-reduced-motion: reduce`, la chorégraphie est remplacée par une apparition sobre et courte, sans signature sonore. Le bouton de passage reste disponible et le focus revient au jeu à la fin.
 
 ## Lancer le projet
 
@@ -98,7 +98,7 @@ Les chemins des sons, le délai entre les sons, la durée du générique et le t
 }
 ```
 
-La durée est exprimée en millisecondes. Les fichiers WAV sont des synthèses originales générées avec `npm run sounds`; leur absence ou le blocage de la lecture automatique ne modifie pas la chronologie visuelle.
+La durée est exprimée en millisecondes. Les fichiers WAV sont des synthèses originales générées avec `npm run sounds`; leur absence ne modifie pas la chronologie visuelle.
 
 ## Dictionnaire
 
