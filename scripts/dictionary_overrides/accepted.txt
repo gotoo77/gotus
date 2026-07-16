@@ -1,0 +1,3 @@
+# Mots validés manuellement comme propositions acceptées.
+# Une ligne par mot de six lettres ; les accents sont normalisés.
+# Ces mots ne deviennent pas automatiquement des réponses possibles.

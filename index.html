@@ -9,7 +9,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Gotus, un jeu gratuit de lettres françaises en six essais.">
+  <meta name="description" content="Gotus, un jeu gratuit de lettres françaises en six essais." data-i18n-content="meta.description">
   <meta name="application-name" content="Gotus 2.3.0">
   <meta name="author" content="Gotoo et les contributeurs">
   <title>Gotus – Jeu de lettres</title>
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="assets/css/gotus.css?v=2.3.0">
 </head>
 <body>
-  <a class="skip-link" href="#main">Aller au jeu</a>
+  <a class="skip-link" href="#main" data-i18n="nav.skip">Aller au jeu</a>
 
   <div id="app" class="app">
     <header class="site-header">
@@ -42,16 +42,29 @@
           aria-checked="true"
         >
           <span class="theme-icon" aria-hidden="true">☾</span>
-          <span class="theme-label">Mode sombre</span>
+          <span class="sr-only theme-label">Mode sombre</span>
         </button>
-        <button id="newGame" type="button" class="primary">Nouvelle partie</button>
+        <div id="languageSwitch" class="language-switch" role="group" aria-label="Langue">
+          <button type="button" data-language="fr" aria-pressed="true">
+            <span class="flag flag-fr" aria-hidden="true"></span>
+            <span aria-hidden="true">FR</span>
+            <span class="sr-only">Français</span>
+          </button>
+          <button type="button" data-language="en" aria-pressed="false">
+            <span class="flag flag-en" aria-hidden="true"></span>
+            <span aria-hidden="true">EN</span>
+            <span class="sr-only">English</span>
+          </button>
+        </div>
+        <button id="settings" type="button" class="settings-button" data-i18n="settings.button">Réglages</button>
+        <button id="newGame" type="button" class="primary" data-i18n="newGame">Nouvelle partie</button>
       </div>
       <p id="stats" class="stats"></p>
     </header>
 
     <main id="main" tabindex="-1">
       <section aria-labelledby="game-title">
-        <h2 id="game-title" class="sr-only">Partie en cours</h2>
+        <h2 id="game-title" class="sr-only" data-i18n="game.title">Partie en cours</h2>
         <div
           id="board"
           class="board"
@@ -59,37 +72,40 @@
           aria-label="Grille du jeu, 6 lignes et 6 colonnes"
           aria-describedby="game-help"
         ></div>
-        <p id="hint" class="hint" role="status" aria-atomic="true">
+        <p id="hint" class="hint" role="status" aria-atomic="true" data-i18n="game.initialHint">
           Trouvez le mot de 6 lettres. La première lettre est donnée.
         </p>
+        <div id="responseTimer" class="response-timer" hidden aria-hidden="true">
+          <span id="responseTimerValue" class="response-timer-value">8</span>
+        </div>
         <p id="resultSummary" class="result-summary" role="status" aria-atomic="true"></p>
-        <p id="game-help" class="game-help">
+        <p id="game-help" class="game-help" data-i18n="game.help">
           Utilisez le clavier ou les boutons ci-dessous. Entrée valide le mot et Retour arrière efface une lettre.
         </p>
         <div id="keyboard" class="keyboard" role="group" aria-label="Clavier virtuel"></div>
       </section>
 
       <section class="legend" aria-labelledby="legend-title">
-        <h2 id="legend-title">Légende</h2>
+        <h2 id="legend-title" data-i18n="legend.title">Légende</h2>
         <ul>
-          <li><span class="legend-cell correct" aria-hidden="true">A</span> Lettre bien placée</li>
-          <li><span class="legend-cell present" aria-hidden="true">A</span> Lettre présente ailleurs</li>
-          <li><span class="legend-cell absent" aria-hidden="true">A</span> Lettre absente</li>
+          <li><span class="legend-cell correct" aria-hidden="true">A</span> <span data-i18n="legend.correct">Lettre bien placée</span></li>
+          <li><span class="legend-cell present" aria-hidden="true">A</span> <span data-i18n="legend.present">Lettre présente ailleurs</span></li>
+          <li><span class="legend-cell absent" aria-hidden="true">A</span> <span data-i18n="legend.absent">Lettre absente</span></li>
         </ul>
       </section>
     </main>
 
     <footer>
-      <button id="rules" class="link-button" type="button">Règles du jeu</button>
+      <button id="rules" class="link-button" type="button" data-i18n="footer.rules">Règles du jeu</button>
       <span aria-hidden="true">•</span>
-      <button id="about" class="link-button" type="button" aria-keyshortcuts="Alt+V">À propos</button>
+      <button id="about" class="link-button" type="button" aria-keyshortcuts="Alt+V" data-i18n="footer.about">À propos</button>
       <span aria-hidden="true">•</span>
-      <button id="replayIntro" class="link-button" type="button">Revoir le générique</button>
+      <button id="replayIntro" class="link-button" type="button" data-i18n="footer.replayIntro">Revoir le générique</button>
       <span aria-hidden="true">•</span>
-      <a href="https://gotoo77.github.io/gotus/versions/">Versions</a>
+      <a href="https://gotoo77.github.io/gotus/versions/" data-i18n="footer.versions">Versions</a>
       <span aria-hidden="true">•</span>
       <a href="https://github.com/gotoo77/gotus" target="_blank" rel="noopener">
-        Code source <span class="sr-only">(nouvel onglet)</span>
+        <span data-i18n="footer.source">Code source</span> <span class="sr-only" data-i18n="footer.newTab">(nouvel onglet)</span>
       </a>
     </footer>
   </div>
@@ -107,7 +123,7 @@
       <h2 id="modal-title">Information</h2>
       <div id="modal-text" class="modal-text"></div>
       <div class="modal-buttons">
-        <button id="modal-ok" type="button">Fermer</button>
+        <button id="modal-ok" type="button" data-i18n="modal.close">Fermer</button>
       </div>
     </div>
   </div>

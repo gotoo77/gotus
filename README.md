@@ -10,6 +10,7 @@ Gotus est un jeu de lettres inspiré de Motus et Wordle, réalisé en HTML, CSS 
 - clavier physique et clavier virtuel AZERTY ;
 - sons et animations configurables ;
 - validation à partir d’un dictionnaire local ;
+- interface internationalisée en français par défaut, avec anglais disponible depuis les réglages ;
 - 7 187 mots acceptés et 1 959 réponses courantes issus de Lexique 4 ;
 - historique des parties et statistiques dans `localStorage` ;
 - panneau de logs intégré, accessible avec `Ctrl + L` ou `Cmd + L` ;
@@ -33,7 +34,22 @@ cd gotus
 npm run dev
 ```
 
-Ouvrez ensuite <http://localhost:8080>. Un serveur local est nécessaire, car le jeu charge sa configuration et son dictionnaire avec `fetch`.
+Ouvrez ensuite l’une des URL affichées par le serveur, par exemple <http://localhost:8080>. Sous WSL, le script affiche aussi une URL `http://<ip-wsl>:8080/` utilisable depuis le navigateur Windows. Un serveur local est nécessaire, car le jeu charge sa configuration, ses traductions et son dictionnaire avec `fetch`.
+
+Les valeurs par défaut du serveur local sont recensées dans `scripts/dev_server.config.json` :
+
+```json
+{
+  "host": "0.0.0.0",
+  "port": 8080
+}
+```
+
+Elles peuvent être surchargées ponctuellement :
+
+```bash
+npm run dev -- --host localhost --port 8081
+```
 
 ## Vérifier le projet
 
@@ -100,13 +116,21 @@ Les chemins des sons, le délai entre les sons, la durée du générique et le t
 
 La durée est exprimée en millisecondes. Les fichiers WAV sont des synthèses originales générées avec `npm run sounds`; leur absence ne modifie pas la chronologie visuelle.
 
+## Internationalisation
+
+Les textes d’interface sont séparés dans `assets/data/i18n/fr.json` et `assets/data/i18n/en.json`. La langue choisie est mémorisée localement avec la clé `gotus-language`; le français reste la langue par défaut.
+
+Chaque langue charge son propre dictionnaire sous la forme `assets/data/dictionary.{lang}-6.json`. Le dictionnaire français reste dérivé de Lexique 4 ; le dictionnaire anglais actuel est une liste de démarrage maintenue dans le dépôt, destinée à être remplacée ou enrichie par une source plus complète.
+
 ## Dictionnaire
 
-Le dictionnaire est dérivé de la base académique française [Lexique 4](https://lexique.org/), qui fournit notamment des fréquences d’usage et des indices de prévalence.
+Le dictionnaire français est dérivé de la base académique [Lexique 4](https://lexique.org/), qui fournit notamment des fréquences d’usage et des indices de prévalence.
 
 - `words` contient les 7 187 propositions reconnues par le jeu ;
 - `answers` contient 1 959 lemmes suffisamment fréquents et connus pour être tirés au sort ;
 - les noms propres, graphies non alphabétiques, doublons et mots d’une autre longueur sont écartés.
+
+Quand une proposition est refusée, le jeu permet de créer un signalement GitHub prérempli. Les mots validés après revue peuvent être ajoutés à `scripts/dictionary_overrides/accepted.txt` : ils seront acceptés comme propositions, sans devenir automatiquement des réponses possibles.
 
 Pour régénérer le fichier depuis la source :
 

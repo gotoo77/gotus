@@ -138,7 +138,7 @@ h1 .dot {
 }
 
 .primary,
-.theme-toggle {
+.settings-button {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 700;
@@ -151,18 +151,92 @@ h1 .dot {
   color: #ffffff;
 }
 
+.settings-button {
+  padding: 7px 12px;
+  border: 2px solid var(--dim);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.language-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(34px, 1fr));
+  min-height: 38px;
+  border: 1px solid color-mix(in srgb, var(--dim) 65%, transparent);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.language-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.language-switch button[aria-pressed="true"] {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.language-switch button + button {
+  border-left: 1px solid color-mix(in srgb, var(--dim) 45%, transparent);
+}
+
+.flag {
+  display: inline-block;
+  width: 16px;
+  aspect-ratio: 4 / 3;
+  border: 1px solid color-mix(in srgb, #ffffff 70%, transparent);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, #000000 18%, transparent);
+}
+
+.flag-fr {
+  background: linear-gradient(90deg, #0055a4 0 33.333%, #ffffff 33.333% 66.666%, #ef4135 66.666% 100%);
+}
+
+.flag-en {
+  background:
+    linear-gradient(0deg, transparent 42%, #ffffff 42% 58%, transparent 58%),
+    linear-gradient(90deg, transparent 42%, #ffffff 42% 58%, transparent 58%),
+    linear-gradient(0deg, transparent 46%, #cf142b 46% 54%, transparent 54%),
+    linear-gradient(90deg, transparent 46%, #cf142b 46% 54%, transparent 54%),
+    linear-gradient(35deg, transparent 45%, #ffffff 45% 55%, transparent 55%),
+    linear-gradient(-35deg, transparent 45%, #ffffff 45% 55%, transparent 55%),
+    linear-gradient(35deg, transparent 48%, #cf142b 48% 52%, transparent 52%),
+    linear-gradient(-35deg, transparent 48%, #cf142b 48% 52%, transparent 52%),
+    #00247d;
+}
+
 .theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 12px;
-  border: 2px solid var(--dim);
-  background: var(--panel);
+  justify-content: center;
+  width: 38px;
+  min-height: 38px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--dim) 65%, transparent);
+  border-radius: 999px;
+  background: transparent;
   color: var(--text);
+  cursor: pointer;
 }
 
 .theme-icon {
-  width: 1.25em;
   font-size: 1.15em;
   line-height: 1;
 }
@@ -171,6 +245,7 @@ h1 .dot {
   background: var(--primary-hover);
 }
 
+.settings-button:hover,
 .theme-toggle:hover,
 .key:hover {
   box-shadow: 0 0 0 2px var(--focus);
@@ -274,6 +349,42 @@ h1 .dot {
   font-weight: 700;
 }
 
+.response-timer {
+  --timer-angle: 360deg;
+  --timer-color: #2f9e44;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  aspect-ratio: 1;
+  margin: 12px auto 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--panel) 0 52%, transparent 53%),
+    conic-gradient(var(--timer-color) var(--timer-angle), color-mix(in srgb, var(--cell-border) 35%, transparent) 0);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--timer-color) 45%, transparent), 0 8px 20px var(--shadow);
+}
+
+.response-timer[hidden] {
+  display: none;
+}
+
+.response-timer[data-urgent="true"] {
+  animation: timer-urgent 700ms ease-in-out infinite alternate;
+}
+
+.response-timer-value {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
 .result-summary {
   min-height: 1.5em;
   color: var(--text);
@@ -335,6 +446,7 @@ h1 .dot {
 
 button:focus-visible,
 a:focus-visible,
+input:focus-visible,
 select:focus-visible,
 [tabindex]:focus-visible {
   outline: 3px solid var(--focus);
@@ -400,6 +512,7 @@ a,
 }
 
 .secondary {
+  display: inline-block;
   padding: 8px 14px;
   border: 2px solid var(--cell-border);
   border-radius: 8px;
@@ -407,6 +520,7 @@ a,
   color: var(--text);
   cursor: pointer;
   font-weight: 700;
+  text-decoration: none;
 }
 
 .intro-preferences {
@@ -428,6 +542,61 @@ a,
   height: 1.25rem;
   margin-top: 0.15rem;
   accent-color: var(--correct);
+}
+
+.settings-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-panel label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.settings-panel input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.2rem;
+  accent-color: var(--correct);
+}
+
+.settings-panel select {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 2px solid var(--cell-border);
+  border-radius: 8px;
+  background: var(--cell);
+  color: var(--text);
+  font: inherit;
+}
+
+.settings-panel .settings-range {
+  grid-template-columns: 1fr;
+}
+
+.settings-panel input[type="range"] {
+  width: 100%;
+  height: auto;
+  margin-top: 2px;
+  accent-color: var(--primary);
+}
+
+.settings-panel strong,
+.settings-panel span span {
+  display: block;
+}
+
+.settings-panel strong {
+  color: var(--text);
+}
+
+.settings-panel span span {
+  margin-top: 2px;
+  color: var(--dim);
 }
 
 /* Générique GOTUS : primitives originales et chorégraphie CSS native. */
@@ -820,6 +989,11 @@ footer a,
   100% { transform: scale(1); }
 }
 
+@keyframes timer-urgent {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+
 /* Panneau de développement ouvert avec Ctrl/Cmd + L. */
 #gotus-log-panel {
   position: fixed;
@@ -962,6 +1136,11 @@ footer a,
   text-align: center;
 }
 
+.report-actions {
+  margin-bottom: 0;
+  text-align: center;
+}
+
 kbd {
   padding: 2px 5px;
   border: 1px solid var(--cell-border);
@@ -1038,12 +1217,8 @@ kbd {
 }
 
 @media (max-width: 380px) {
-  .theme-label {
-    font-size: 0.85rem;
-  }
-
   .primary,
-  .theme-toggle {
+  .settings-button {
     padding-inline: 9px;
   }
 
@@ -1092,6 +1267,7 @@ kbd {
   .key,
   .legend-cell,
   .primary,
+  .settings-button,
   .theme-toggle {
     border-color: ButtonText;
   }

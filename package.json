@@ -8,7 +8,7 @@
     "channel": "stable"
   },
   "scripts": {
-    "dev": "python3 -m http.server 8080 --bind localhost",
+    "dev": "python3 scripts/dev_server.py",
     "check": "node --check assets/js/gotus.js && node --check assets/js/intro.js && node --check assets/js/logger.js && npm test",
     "test": "node --test && python3 -m unittest discover -s tests -p '*_test.py'",
     "build:pages": "python3 scripts/build_pages.py",

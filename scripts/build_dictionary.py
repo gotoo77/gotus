@@ -22,6 +22,7 @@ ACCEPTED_MIN_FREQUENCY = 0.05
 ANSWER_MIN_FREQUENCY = 0.5
 ANSWER_MIN_PREVALENCE = 60
 ANSWER_CATEGORIES = {"ADJ", "ADV", "NOM", "VER"}
+DEFAULT_ACCEPTED_OVERRIDES = Path("scripts/dictionary_overrides/accepted.txt")
 
 
 def normalize_word(value: str) -> str:
@@ -52,7 +53,28 @@ def read_source(source: str) -> str:
         return response.read().decode("utf-8-sig")
 
 
-def build_dictionary(source_text: str) -> dict[str, object]:
+def read_word_overrides(path: Path) -> set[str]:
+    if not path.exists():
+        return set()
+
+    words: set[str] = set()
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        value = line.split("#", 1)[0].strip()
+        if not value:
+            continue
+
+        word = normalize_word(value)
+        if not re.fullmatch(rf"[A-Z]{{{WORD_LENGTH}}}", word):
+            raise ValueError(f"{path}:{line_number}: mot invalide pour Gotus : {value!r}")
+        words.add(word)
+    return words
+
+
+def build_dictionary(
+    source_text: str,
+    *,
+    accepted_overrides: set[str] | None = None,
+) -> dict[str, object]:
     accepted: set[str] = set()
     answers: set[str] = set()
     reader = csv.DictReader(io.StringIO(source_text), delimiter="\t")
@@ -80,6 +102,8 @@ def build_dictionary(source_text: str) -> dict[str, object]:
         ):
             answers.add(normalized)
 
+    accepted.update(accepted_overrides or set())
+
     if not answers or not answers.issubset(accepted):
         raise RuntimeError("La génération a produit un dictionnaire incohérent.")
 
@@ -99,6 +123,7 @@ def build_dictionary(source_text: str) -> dict[str, object]:
             "answerMinimumFrequency": ANSWER_MIN_FREQUENCY,
             "answerMinimumPrevalence": ANSWER_MIN_PREVALENCE,
             "answersAreLemmas": True,
+            "acceptedOverrides": len(accepted_overrides or set()),
         },
         "answers": sorted(answers),
         "words": sorted(accepted),
@@ -118,9 +143,19 @@ def main() -> None:
         default=Path("assets/data/dictionary.fr-6.json"),
         help="Fichier JSON à générer",
     )
+    parser.add_argument(
+        "--accepted-overrides",
+        type=Path,
+        default=DEFAULT_ACCEPTED_OVERRIDES,
+        help="Fichier de mots à accepter en plus de Lexique 4",
+    )
     args = parser.parse_args()
 
-    dictionary = build_dictionary(read_source(args.source))
+    accepted_overrides = read_word_overrides(args.accepted_overrides)
+    dictionary = build_dictionary(
+        read_source(args.source),
+        accepted_overrides=accepted_overrides,
+    )
     args.output.write_text(
         json.dumps(dictionary, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",

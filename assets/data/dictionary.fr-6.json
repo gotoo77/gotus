@@ -13,7 +13,8 @@
     "acceptedMinimumFrequency": 0.05,
     "answerMinimumFrequency": 0.5,
     "answerMinimumPrevalence": 60,
-    "answersAreLemmas": true
+    "answersAreLemmas": true,
+    "acceptedOverrides": 0
   },
   "answers": [
     "ABATTU",

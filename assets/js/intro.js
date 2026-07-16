@@ -29,6 +29,22 @@ export const INTRO_AUDIO_CUES = Object.freeze([
     { at: 5080, sound: 'signature' }
 ]);
 
+const DEFAULT_LABELS = Object.freeze({
+    tagline: 'Le jeu de lettres qui rebondit',
+    description: "Générique d'introduction.",
+    start: 'Lancer le générique',
+    skip: 'Passer'
+});
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 export function safeStorageGet(storage, key) {
     try {
         return storage?.getItem(key) ?? null;
@@ -74,7 +90,8 @@ function defaultStorage() {
     }
 }
 
-function introMarkup() {
+function introMarkup(labels = DEFAULT_LABELS) {
+    const text = { ...DEFAULT_LABELS, ...labels };
     return `
       <div class="intro-stage" aria-hidden="true">
         <div class="intro-beam intro-beam-a"></div>
@@ -97,16 +114,16 @@ function introMarkup() {
           <span class="intro-letter intro-letter-u">U</span>
           <span class="intro-letter intro-letter-s">S</span>
         </div>
-        <p class="intro-tagline">Le jeu de lettres qui rebondit</p>
+        <p class="intro-tagline">${escapeHtml(text.tagline)}</p>
       </div>
       <div class="intro-accessible-copy">
         <h2 id="intro-title">GOTUS</h2>
-        <p>Générique d'introduction.</p>
+        <p>${escapeHtml(text.description)}</p>
       </div>
       <div class="intro-start-panel">
-        <button class="intro-start" type="button">Lancer le générique</button>
+        <button class="intro-start" type="button">${escapeHtml(text.start)}</button>
       </div>
-      <button class="intro-skip" type="button">Passer</button>`;
+      <button class="intro-skip" type="button">${escapeHtml(text.skip)}</button>`;
 }
 
 export function createIntro(options = {}) {
@@ -117,6 +134,7 @@ export function createIntro(options = {}) {
     const matchMedia = options.matchMedia ?? globalThis.matchMedia?.bind(globalThis);
     const audioFactory = options.audioFactory ?? (source => new Audio(source));
     const sounds = options.sounds ?? {};
+    const labels = options.labels ?? DEFAULT_LABELS;
     const duration = options.duration ?? 5900;
     const reducedDuration = options.reducedDuration ?? 1500;
     const onEvent = options.onEvent ?? (() => {});
@@ -201,7 +219,7 @@ export function createIntro(options = {}) {
         element.setAttribute('role', 'dialog');
         element.setAttribute('aria-modal', 'true');
         element.setAttribute('aria-labelledby', 'intro-title');
-        element.innerHTML = introMarkup();
+        element.innerHTML = introMarkup(labels);
 
         let resolvePromise;
         const promise = new Promise(resolve => { resolvePromise = resolve; });
